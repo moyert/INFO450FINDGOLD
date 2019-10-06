@@ -1,0 +1,191 @@
+#include <iostream>
+#include <time.h>
+#include <iomanip>
+using namespace std;
+
+// Declare const variables
+const int RSIZE = 8;
+const int CSIZE = 8;
+const int MAXGUESS = 5;
+const int GOLD = 5;
+const int BOMB = 1;
+
+// declare functions
+void gameBoard(char showGame[RSIZE][CSIZE]);
+void playBoard(char showGame[RSIZE][CSIZE]);
+void presentBoard(char presentGame[RSIZE][CSIZE]);
+
+
+int main()
+{
+	char answer;
+
+	// Loops to ask the player if they would like to continue playing 
+	do
+	{
+		// Function to store G and B locations 
+		char showFinalBoard[RSIZE][CSIZE];		
+
+		gameBoard(showFinalBoard);
+		playBoard(showFinalBoard);
+		presentBoard(showFinalBoard);
+
+		cout << "\n\t Play another round (Enter Y or N)?  ";
+		cin >> answer;
+
+	} while (answer == 'Y' || answer == 'y');
+
+
+
+	system("pause");
+	return 0;
+}
+// function to give instructions
+void gameBoard(char showGame[RSIZE][CSIZE])
+{
+	int row;
+	int col;
+	cout << "\n\n\n\t   ";
+
+	for (col = 0; col < CSIZE; col++)
+	{
+		cout << setw(5) << col + 1;
+	}
+	cout << endl;
+
+
+	for (row = 0; row < RSIZE; row++)
+	{
+		cout << "\t" << row + 1;
+		cout << " | ";
+
+		for (col = 0; col < CSIZE; col++)
+		{
+			cout << setw(5) << " ? ";
+		}
+		cout << setw(5) << " | ";
+		cout << endl;
+	}
+	cout << "\t  - - - - - - - - - - - - - - - - - - - - - - -" << endl;
+	cout << endl;
+
+	cout << "\n\n\t\t    * * * * * * * * * * * * * * * " << endl;
+	cout << "\t\t    *                           * " << endl;
+	cout << "\t\t    *      Digging For Gold!    * " << endl;
+	cout << "\t\t    *                           * " << endl;
+	cout << "\t\t    *    You have 5 Guesses.    * " << endl;
+	cout << "\t\t    *   5 Pieces of Gold (G),   * " << endl;
+	cout << "\t\t    *        and 1 Bomb (B)     * " << endl;
+	cout << "\t\t    *        Good Luck!         * " << endl;
+	cout << "\t\t    *                           * " << endl;
+	cout << "\t\t    * * * * * * * * * * * * * * * " << endl;
+}
+
+// function to initalize Gs and b 
+void playBoard(char showGame[RSIZE][CSIZE])
+{
+	char rows, cols;
+	int gold;
+	int bomb;
+	int xCoord, yCoord;
+
+	for (rows = 0; rows < RSIZE; rows++)
+	{
+		for (cols = 0; cols < CSIZE; cols++)
+		{
+			showGame[rows][cols] = ' ';
+		}
+	}
+	srand(time(NULL)); // this sections makes the Gs and B random
+	for (gold = 0; gold < GOLD; gold++)
+	{
+		xCoord = rand() % RSIZE; 
+		yCoord = rand() % CSIZE;
+		showGame[xCoord][yCoord] = 'G';
+	}
+	for (bomb = 0; bomb < BOMB; bomb++)
+	{
+		xCoord = rand() % RSIZE;
+		yCoord = rand() % CSIZE;
+		showGame[xCoord][yCoord] = 'B';
+	}
+}
+void presentBoard(char presentGame[RSIZE][CSIZE])
+{
+	int row, col;
+	int guesses = MAXGUESS;
+	int points = 0;
+
+	do
+	{
+		cout << "\n\n\t What is your x-coordinate (row number from 1-8)? ";
+		cin >> row;
+		cout << "\n\t What is your y-coordinate (column number from 1-8)? ";
+		cin >> col;
+
+		// Allows the user to input what they would like to select
+		if ((row <= 8 && row >= 1) && (col <= 8 && col >= 1))
+		{
+			
+			if (presentGame[row - 1][col - 1] == 'G')
+			{
+				cout << "\n\n YOU FOUND GOLD! You have ...";
+				// If they find gold this makes it so they wont lose a turn
+				presentGame[row - 1][col - 1] = 'F';
+				points = points + 1;
+				guesses++;
+				guesses--;
+				cout << "\n\n " << guesses << " GUESSES LEFT! \n\n" << endl;
+				continue;
+			}
+			else if (presentGame[row - 1][col - 1] == 'B')
+			{
+				guesses = 0;
+				cout << "\n\n YOU HIT A BOMB! \n\n GAME OVER!!! \n" << endl;
+				break; 
+			}
+			else
+				guesses--;
+			cout << "\n\n Oops! No Luck :( ";
+			cout << "\n\n " << guesses << " guess(es) left! \n" << endl;
+		}
+		else
+		{
+			cout << "\n BOTH your x-coordinate and y-coordinate must be from 1-8 \n\n Try again!" << endl;
+			cout << endl;
+		}
+	} while (guesses > 0);
+
+	
+	cout << "\n\n\t\t    YOU EARNED: " << points << " POINT(s)." << endl;
+
+	cout << "\n\n\t    * * * * * * * * * * * * * * " << endl;
+	cout << "\n\t          Here's your board!       " << endl;
+	cout << "\n\t     * * * * * * * * * * * * * * *" << endl;
+
+	// The section displays the results
+
+	for (col = 0; col < CSIZE; col++)
+	{
+		cout << setw(5) << col + 1;
+	}
+	cout << endl;
+	cout << "\t  - - - - - - - - - - - - - - - - - - - - - - -" << endl;
+
+	for (row = 0; row < RSIZE; row++)
+	{
+		cout << setw(5) << "\t" << row + 1;
+		cout << " | ";
+
+		for (col = 0; col < CSIZE; col++)
+		{
+			cout << setw(5) << presentGame[row][col];
+		}
+		cout << setw(5) << " | ";
+		cout << endl;
+	}
+	cout << "\t  - - - - - - - - - - - - - - - - - - - - - - -" << endl;
+	cout << endl;
+}
+
+
